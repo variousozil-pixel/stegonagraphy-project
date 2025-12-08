@@ -126,11 +126,38 @@ def encode():
         print("could not save")
 
 
-
-
 def decode():
-    # to do
-    print("")
+    # load bmp
+    bmp = input("enter bmp file: ").strip()
+    data, w, h, pix_start = read_bmp(bmp)
+
+    if data is None:
+        print("wrong file or not 24 bit bmp")
+        return
+
+    # extract lsb bits
+    bits = []
+    total_pixels = w * h
+
+    for i in range(total_pixels):
+        pos = pix_start + i * 3
+        # get the lsb from R, G , B
+        bits.append(data[pos] & 1)
+        bits.append(data[pos + 1] & 1)
+        bits.append(data[pos + 2] & 1)
+
+    # need at least 32 bits for header
+    if len(bits) < 32:
+        print("no hidden message or corrupted data")
+        return
+
+    # read 4-byte length header
+    msg_len = 0
+    for i in range(32):
+        msg_len = (msg_len << 1) | bits[i]
+    return
+    #finiso my codo tmrowo od decode gang
+
 
 
 def main():

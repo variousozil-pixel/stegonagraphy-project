@@ -155,9 +155,49 @@ def decode():
     msg_len = 0
     for i in range(32):
         msg_len = (msg_len << 1) | bits[i]
-    return
-    #finiso my codo tmrowo od decode gang
+    
+   # now extract the message bits
+needed_bits = msg_len * 8
 
+if len(bits) < 32 + needed_bits:
+    print("not enough data to extract full message")
+    return
+
+msg_bits = bits[32 : 32 + needed_bits]
+
+# convert bits back to bytes
+msg_bytes = []
+cur = 0
+bit_count = 0
+
+for b in msg_bits:
+    cur = (cur << 1) | b
+    bit_count += 1
+    if bit_count == 8:
+        msg_bytes.append(cur)
+        cur = 0
+        bit_count = 0
+
+# ask user how to output
+choice = input("print text (t) or save to file (f)? ").strip().lower()
+
+if choice == "t":
+    # try utf-8 decode
+    try:
+        text = bytearray(msg_bytes).decode("utf-8")
+        print("decoded message:")
+        print(text)
+    except:
+        print("message is not utf-8 text")
+        print(msg_bytes)
+else:
+    out_name = input("output file name: ").strip()
+    try:
+        with open(out_name, "wb") as f:
+            f.write(bytearray(msg_bytes))
+        print("saved to", out_name)
+    except:
+        print("could not save file")
 
 
 def main():
